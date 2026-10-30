@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>くりあがりたしざんタイムアタック</title>
+
+<style>
+
+body{
+    font-family:sans-serif;
+    text-align:center;
+    background:#f5f7ff;
+    margin:0;
+    transition:background 0.3s;
+}
+
+h1{
+    margin-top:20px;
+}
+
+#question{
+    font-size:80px;
+    margin-top:40px;
+    margin-bottom:20px;
+}
+
+#answer{
+    font-size:70px;
+    height:90px;
+    color:#333;
+}
+
+#message{
+    height:50px;
+    font-size:30px;
+}
+
+#status{
+    font-size:24px;
+    margin-bottom:20px;
+}
+
+#buttons{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    flex-wrap:nowrap;
+}
+
+button{
+    width:100px;
+    height:100px;
+    font-size:40px;
+    border:none;
+    border-radius:15px;
+    background:#4f8cff;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+#zeroButton{
+    margin-top:10px;
+}
+
+.correct{
+    animation:flashGreen 0.8s;
+}
+
+.wrong{
+    animation:flashRed 0.8s;
+}
+
+#resultMark{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:180px;
+    font-weight:bold;
+    display:none;
+    z-index:1000;
+    pointer-events:none;
+}
+
+@keyframes flashGreen{
+    0%{background:#7cff7c;}
+    100%{background:#f5f7ff;}
+}
+
+@keyframes flashRed{
+    0%{background:#ff9d9d;}
+    100%{background:#f5f7ff;}
+}
+
+@keyframes shake{
+    0%{transform:translateX(0);}
+    20%{transform:translateX(-10px);}
+    40%{transform:translateX(10px);}
+    60%{transform:translateX(-10px);}
+    80%{transform:translateX(10px);}
+    100%{transform:translateX(0);}
+}
+
+.shake{
+    animation:shake 0.5s;
+}
+
+.confetti{
+    position:fixed;
+    font-size:40px;
+    z-index:999;
+    pointer-events:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>くりあがりたしざん</h1>
+
+<div id="status"></div>
+
+<div id="question"></div>
+
+<div id="answer"></div>
+
+<div id="message"></div>
+
+<div id="buttons"></div>
+
+<div id="resultMark"></div>
+
+<script>
+
+let problems = [];
+let current = 0;
+let input = "";
+let startTime;
+
+const question = document.getElementById("question");
+const answer = document.getElementById("answer");
+const statusDiv = document.getElementById("status");
+const resultMark = document.getElementById("resultMark");
+const buttonsDiv = document.getElementById("buttons");
+
+function makeProblems(){
+
+    problems = [];
+
+    while(problems.length < 10){
+
+        const a = Math.floor(Math.random()*9)+1;
+        const b = Math.floor(Math.random()*9)+1;
+
+        if(a + b >= 10){
+            problems.push({a,b});
+        }
+    }
+}
+
+function showProblem(){
+
+    input = "";
+    answer.textContent = "";
+
+    const p = problems[current];
+
+    question.textContent = `${p.a} + ${p.b} = ?`;
+
+    statusDiv.textContent =
+        `もんだい ${current + 1} / 10`;
+}
+
+document.addEventListener("keydown", (e) => {
+
+    // 数字キー
+    if(e.key >= "0" && e.key <= "9"){
+        press(e.key);
+    }
+
+});
+
+
+function createConfetti(){
+
+    for(let i=0;i<30;i++){
+
+        const c = document.createElement("div");
+
+        c.className = "confetti";
+        c.textContent = "🎉";
+
+        c.style.left = Math.random()*100 + "vw";
+        c.style.top = "-50px";
+
+        document.body.appendChild(c);
+
+        c.animate(
+            [
+                {transform:"translateY(0px) rotate(0deg)"},
+                {transform:"translateY(220vh) rotate(720deg)"}
+            ],
+            {
+                duration:1000,
+                easing:"linear"
+            }
+        );
+
+        setTimeout(()=>c.remove(),1000);
+    }
+}
+
+function showCorrect(){
+
+    document.body.classList.add("correct");
+
+    resultMark.textContent = "⭕";
+    resultMark.style.color = "#00aa00";
+    resultMark.style.display = "block";
+
+    createConfetti();
+
+    setTimeout(()=>{
+        document.body.classList.remove("correct");
+        resultMark.style.display = "none";
+    },100);
+}
+
+function showWrong(){
+
+    document.body.classList.add("wrong");
+    document.body.classList.add("shake");
+
+    resultMark.textContent = "❌";
+    resultMark.style.color = "red";
+    resultMark.style.display = "block";
+
+    setTimeout(()=>{
+        document.body.classList.remove("wrong");
+        document.body.classList.remove("shake");
+        resultMark.style.display = "none";
+    },800);
+}
+
+function check(){
+
+    const p = problems[current];
+
+    if(Number(input) === p.a + p.b){
+
+        showCorrect();
+
+        setTimeout(()=>{
+
+            current++;
+
+            if(current >= 10){
+                finish();
+                return;
+            }
+
+            showProblem();
+
+        },100);
+
+    }else{
+
+        showWrong();
+
+        setTimeout(()=>{
+            showProblem();
+        },800);
+    }
+}
+
+function press(n){
+
+    input += n;
+
+    answer.textContent = input;
+
+    if(input.length >= 2){
+        check();
+    }
+}
+
+function finish(){
+
+    const sec =
+        ((Date.now() - startTime)/1000).toFixed(2);
+
+    document.body.innerHTML = `
+        <div style="margin-top:100px">
+            <h1>🎉 クリア！ 🎉</h1>
+            <h2>タイム</h2>
+            <div style="font-size:80px;color:#ff8800;">
+                ${sec}秒
+            </div>
+        </div>
+    `;
+}
+
+for(let i=0;i<=9;i++){
+
+    const btn = document.createElement("button");
+
+    btn.textContent = i;
+
+    btn.onclick = () => press(i);
+
+    buttonsDiv.appendChild(btn);
+}
+
+makeProblems();
+
+startTime = Date.now();
+
+showProblem();
+
+</script>
+
+</body>
+</html>
