@@ -1,20 +1,21 @@
 export async function onRequestGet(context) {
 
-  const list =
-    await context.env.RANKING.list();
+  const list = await context.env.RANKING.list();
 
-  const records = [];
+  let records = [];
 
-  for(const key of list.keys){
+  for (const key of list.keys) {
 
     const value =
       await context.env.RANKING.get(key.name);
 
-    records.push(JSON.parse(value));
+    if (value) {
+      records.push(JSON.parse(value));
+    }
   }
 
   records.sort(
-    (a,b)=>a.time-b.time
+    (a, b) => a.time - b.time
   );
 
   return Response.json(records);
