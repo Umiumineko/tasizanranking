@@ -323,9 +323,9 @@ async function finish(){
             const newRecord = {
                 name: name,
                 time: sec,
-                date: new Date().toLocaleString()
+                date: new Date().toLocaleString("ja-JP"),
+                day: new Date().toLocaleDateString("ja-JP")
             };
-        
             await fetch("/save",{
                 method:"POST",
                 headers:{
@@ -398,50 +398,116 @@ function showRanking(
     ranking
 ){
 
+    const today =
+        new Date().toLocaleDateString("ja-JP");
+
+    const todayRanking =
+        ranking
+        .filter(r => r.day === today)
+        .sort((a,b)=>a.time-b.time)
+        .slice(0,10);
+
+    const allRanking =
+        [...ranking]
+        .sort((a,b)=>a.time-b.time)
+        .slice(0,10);
+
     let html = `
 
-    <div style="margin-top:50px">
+    <div style="margin-top:40px">
 
-      <h1>🎉 ランクイン！ 🎉</h1>
+        <h1>🎉 ランクイン！ 🎉</h1>
 
-      <h2>${myTime}秒</h2>
+        <h2>${myTime}秒</h2>
 
-      <h3>${myRank}位です！</h3>
+        <h3>${myRank}位です！</h3>
 
-      <h2>🏆 学級ランキング 🏆</h2>
+        <hr style="width:80%;margin:30px auto;">
 
-      <table
-        style="
-        margin:auto;
-        font-size:30px;
-        border-collapse:collapse;
-        "
-      >
+        <h2>🏆 本日のランキング</h2>
+
+        <table
+            style="
+                margin:auto;
+                font-size:24px;
+                border-collapse:collapse;
+            "
+        >
+
+        <tr>
+            <th style="padding:10px;">順位</th>
+            <th style="padding:10px;">名前</th>
+            <th style="padding:10px;">タイム</th>
+        </tr>
     `;
 
-    ranking.forEach((r,index)=>{
+    todayRanking.forEach((r,index)=>{
+
         html += `
         <tr>
-          <td style="padding:10px;">
-            ${index+1}位
-          </td>
-    
-          <td style="padding:10px;">
-            ${r.name}
-          </td>
-    
-          <td style="padding:10px;">
-            ${r.time}秒
-          </td>
-    
-          <td style="padding:10px;font-size:18px;">
-            ${r.date || ""}
-          </td>
+            <td style="padding:10px;">
+                ${index+1}位
+            </td>
+
+            <td style="padding:10px;">
+                ${r.name}
+            </td>
+
+            <td style="padding:10px;">
+                ${r.time}秒
+            </td>
         </tr>
         `;
     });
+
     html += `
-      </table>
+        </table>
+
+        <br><br>
+
+        <h2>🌟 歴代ランキング</h2>
+
+        <table
+            style="
+                margin:auto;
+                font-size:24px;
+                border-collapse:collapse;
+            "
+        >
+
+        <tr>
+            <th style="padding:10px;">順位</th>
+            <th style="padding:10px;">名前</th>
+            <th style="padding:10px;">タイム</th>
+            <th style="padding:10px;">日付</th>
+        </tr>
+    `;
+
+    allRanking.forEach((r,index)=>{
+
+        html += `
+        <tr>
+            <td style="padding:10px;">
+                ${index+1}位
+            </td>
+
+            <td style="padding:10px;">
+                ${r.name}
+            </td>
+
+            <td style="padding:10px;">
+                ${r.time}秒
+            </td>
+
+            <td style="padding:10px;">
+                ${r.day || "-"}
+            </td>
+        </tr>
+        `;
+    });
+
+    html += `
+        </table>
     </div>
     `;
 
