@@ -420,25 +420,26 @@ function showRanking(
     `;
 
     ranking.forEach((r,index)=>{
-
         html += `
         <tr>
           <td style="padding:10px;">
             ${index+1}位
           </td>
-
+    
           <td style="padding:10px;">
             ${r.name}
           </td>
-
+    
           <td style="padding:10px;">
             ${r.time}秒
           </td>
+    
+          <td style="padding:10px;font-size:18px;">
+            ${r.date || ""}
+          </td>
         </tr>
         `;
-
     });
-
     html += `
       </table>
     </div>
