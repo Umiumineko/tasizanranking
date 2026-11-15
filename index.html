@@ -122,19 +122,9 @@ button:hover{
 
 <body>
 
-<h1>くりあがりたしざん</h1>
-<div id="status"></div>
-
-<div id="question"></div>
-
-<div id="answer"></div>
-
-<div id="message"></div>
-
-<div id="buttons"></div>
-
+<div id="app"></div>
 <div id="resultMark"></div>
-
+    
 <script>
 
 let problems = [];
@@ -142,12 +132,102 @@ let current = 0;
 let input = "";
 let startTime;
 
-const question = document.getElementById("question");
-const answer = document.getElementById("answer");
-const statusDiv = document.getElementById("status");
-const resultMark = document.getElementById("resultMark");
-const buttonsDiv = document.getElementById("buttons");
+const app = document.getElementById("app");
+const resultMark =
+    document.getElementById("resultMark");
 
+let question;
+let answer;
+let statusDiv;
+let buttonsDiv;
+
+function showStartScreen(){
+
+    app.innerHTML = `
+        <div
+            style="
+                margin-top:150px;
+            "
+        >
+            <h1
+                style="
+                    font-size:60px;
+                "
+            >
+                くりあがりたしざん
+            </h1>
+
+            <button
+                id="startButton"
+                style="
+                    width:250px;
+                    height:120px;
+                    font-size:50px;
+                    margin-top:50px;
+                "
+            >
+                スタート
+            </button>
+        </div>
+    `;
+
+    document
+        .getElementById("startButton")
+        .addEventListener(
+            "click",
+            startGame
+        );
+}
+
+function startGame(){
+
+    app.innerHTML = `
+        <h1>くりあがりたしざん</h1>
+
+        <div id="status"></div>
+
+        <div id="question"></div>
+
+        <div id="answer"></div>
+
+        <div id="message"></div>
+
+        <div id="buttons"></div>
+    `;
+
+    question =
+        document.getElementById("question");
+
+    answer =
+        document.getElementById("answer");
+
+    statusDiv =
+        document.getElementById("status");
+
+    buttonsDiv =
+        document.getElementById("buttons");
+
+    for(let i=0;i<=9;i++){
+
+        const btn =
+            document.createElement("button");
+
+        btn.textContent = i;
+
+        btn.onclick = () => press(i);
+
+        buttonsDiv.appendChild(btn);
+    }
+
+    makeProblems();
+
+    current = 0;
+
+    startTime = Date.now();
+
+    showProblem();
+}
+    
 function makeProblems(){
 
     problems = [];
