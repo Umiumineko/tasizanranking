@@ -209,23 +209,23 @@ function startGame(){
 
     for(let i=0;i<=9;i++){
 
-        const btn =
-            document.createElement("button");
+    const btn =
+        document.createElement("button");
 
-        btn.textContent = i;
+    btn.textContent = i;
 
-        btn.onclick = () => press(i);
+    btn.onclick = () => press(i);
 
-        buttonsDiv.appendChild(btn);
-    }
+    buttonsDiv.appendChild(btn);
+}
 
-    makeProblems();
+makeProblems();
 
-    current = 0;
+current = 0;
 
-    startTime = Date.now();
+startTime = Date.now();
 
-    showProblem();
+showProblem();
 }
     
 function makeProblems(){
@@ -593,22 +593,7 @@ function showRanking(
 
     document.body.innerHTML = html;
 }
-for(let i=0;i<=9;i++){
 
-    const btn = document.createElement("button");
-
-    btn.textContent = i;
-
-    btn.onclick = () => press(i);
-
-    buttonsDiv.appendChild(btn);
-}
-
-makeProblems();
-
-startTime = Date.now();
-
-showProblem();
 
 </script>
 
