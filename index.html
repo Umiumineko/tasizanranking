@@ -320,30 +320,52 @@ async function finish(){
 
         if(name){
 
+            const newRecord = {
+                name: name,
+                time: sec,
+                date: new Date().toLocaleString()
+            };
+        
             await fetch("/save",{
                 method:"POST",
                 headers:{
                     "Content-Type":"application/json"
                 },
-                body:JSON.stringify({
-                    name:name,
-                    time:sec,
-                    date:new Date().toLocaleString()
-                })
+                body:JSON.stringify(newRecord)
             });
+        
+            const latest =
+                await fetch("/ranking")
+                 .then(r=>r.json());
 
+            const exists = latest.some(
+                r =>
+                    r.name === newRecord.name &&
+                    r.time === newRecord.time
+            );
+            
+            if(!exists){
+                latest.push(newRecord);
+            }
+            
+            latest.sort(
+                (a,b)=>a.time-b.time
+            );
+
+            const myRankUpdated =
+                latest.findIndex(
+                    r =>
+                        r.name === newRecord.name &&
+                        r.time === newRecord.time
+                ) + 1;
+
+            showRanking(
+                sec,
+                myRankUpdated,
+                latest.slice(0,10)
+            );
         }
-
-        const latest =
-            await fetch("/ranking")
-             .then(r=>r.json());
-
-        showRanking(
-           sec,
-           rank,
-           latest.slice(0,10)
-        );
-
+        
     }else{
 
         document.body.innerHTML = `
